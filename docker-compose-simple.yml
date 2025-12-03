@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: smartqueue-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: smartqueue-api-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - JWT_SECRET=smartqueue-secret-123
+    depends_on:
+      - mongodb
+
+  queue-service:
+    build: ./services/queue-service
+    container_name: smartqueue-queue-service
+    ports:
+      - "4001:4001"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/smartqueue?authSource=admin
+    depends_on:
+      - mongodb
+
+  user-service:
+    build: ./services/user-service
+    container_name: smartqueue-user-service
+    ports:
+      - "4003:4003"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/smartqueue?authSource=admin
+    depends_on:
+      - mongodb

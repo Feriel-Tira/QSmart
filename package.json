@@ -1,0 +1,19 @@
+{
+  "name": "smartqueue-backend",
+  "version": "1.0.0",
+  "description": "Backend for SmartQueue system",
+  "scripts": {
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "restart": "docker-compose restart",
+    "logs": "docker-compose logs -f",
+    "seed": "node scripts/seed.js",
+    "test": "echo \"No tests yet\""
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "dependencies": {
+    "graphql-tag": "^2.12.6"
+  }
+}

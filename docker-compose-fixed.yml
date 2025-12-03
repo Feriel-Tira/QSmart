@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    image: smartqueue-api-gateway:latest
+    container_name: smartqueue-api-gateway
+    ports:
+      - "4000:4000"
+
+  mongodb:
+    image: mongo:6
+    container_name: smartqueue-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123

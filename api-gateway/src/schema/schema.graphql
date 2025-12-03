@@ -1,0 +1,162 @@
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  phone: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Queue {
+  id: ID!
+  name: String!
+  description: String
+  maxActiveTickets: Int!
+  averageServiceTime: Int
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+  currentTicket: Ticket
+  tickets: [Ticket!]!
+  stats: QueueStats
+}
+
+type Ticket {
+  id: ID!
+  ticketNumber: String!
+  queueId: ID!
+  userId: ID
+  status: TicketStatus!
+  priority: Priority!
+  estimatedWaitTime: Int
+  position: Int
+  createdAt: String!
+  calledAt: String
+  servedAt: String
+  user: User
+  queue: Queue
+}
+
+type QueueStats {
+  queueId: ID!
+  averageWaitTime: Int!
+  ticketsServedToday: Int!
+  activeTickets: Int!
+  estimatedCompletionTime: Int
+}
+
+type Agent {
+  id: ID!
+  name: String!
+  email: String!
+  queueId: ID!
+  isActive: Boolean!
+  currentTicket: Ticket
+}
+
+enum TicketStatus {
+  WAITING
+  CALLED
+  SERVED
+  CANCELLED
+  EXPIRED
+}
+
+enum Priority {
+  NORMAL
+  PRIORITY
+  VIP
+  URGENCY
+}
+
+type Query {
+  # User queries
+  me: User
+  user(id: ID!): User
+  
+  # Queue queries
+  queues: [Queue!]!
+  queue(id: ID!): Queue
+  activeQueues: [Queue!]!
+  
+  # Ticket queries
+  ticket(id: ID!): Ticket
+  myTickets: [Ticket!]!
+  queueTickets(queueId: ID!): [Ticket!]!
+  
+  # Agent queries
+  agent(id: ID!): Agent
+  agentQueues: [Queue!]!
+  
+  # Analytics
+  queueStats(queueId: ID!): QueueStats
+  dailyStats(queueId: ID!): DailyStats
+}
+
+type Mutation {
+  # User mutations
+  registerUser(email: String!, name: String!, password: String!, phone: String): AuthPayload!
+  loginUser(email: String!, password: String!): AuthPayload!
+  updateUser(name: String, phone: String): User!
+  
+  # Queue mutations
+  createQueue(name: String!, description: String, maxActiveTickets: Int!): Queue!
+  updateQueue(id: ID!, name: String, description: String, maxActiveTickets: Int, isActive: Boolean): Queue!
+  
+  # Ticket mutations
+  createTicket(queueId: ID!, priority: Priority = NORMAL): Ticket!
+  cancelTicket(ticketId: ID!): Ticket!
+  
+  # Agent mutations
+  agentLogin(email: String!, password: String!): AgentAuthPayload!
+  callNextTicket(queueId: ID!): Ticket!
+  serveTicket(ticketId: ID!): Ticket!
+  pauseTicket(ticketId: ID!): Ticket!
+  recallTicket(ticketId: ID!): Ticket!
+}
+
+type Subscription {
+  ticketUpdated(queueId: ID!): TicketUpdate!
+  queueUpdated: QueueUpdate!
+}
+
+type TicketUpdate {
+  ticket: Ticket!
+  action: TicketAction!
+}
+
+type QueueUpdate {
+  queue: Queue!
+  action: QueueAction!
+}
+
+enum TicketAction {
+  CREATED
+  CALLED
+  SERVED
+  CANCELLED
+  MOVED
+}
+
+enum QueueAction {
+  UPDATED
+  ACTIVATED
+  DEACTIVATED
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type AgentAuthPayload {
+  token: String!
+  agent: Agent!
+}
+
+type DailyStats {
+  date: String!
+  totalTickets: Int!
+  averageWaitTime: Int!
+  peakHour: String!
+}
